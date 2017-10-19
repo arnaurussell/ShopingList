@@ -41,7 +41,7 @@
             android:layout_alignParentTop="true"
             android:ems="10"
             android:inputType="textPersonName"
-            android:text="Name" />
+            android:imeOptions="actionDone"/>
 
     </RelativeLayout>
 
