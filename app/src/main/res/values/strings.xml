@@ -3,4 +3,6 @@
     <string name="confirm">Confirmation</string>
     <string name="remove">Remove</string>
     <string name="confirm_mesage">\"Are you sure you want to remove \'%1$s\' ?\"</string>
+    <string name="cannot_write">couldn\'t Write List</string>
+    <string name="cannot_read">couldn\'t read list</string>
 </resources>

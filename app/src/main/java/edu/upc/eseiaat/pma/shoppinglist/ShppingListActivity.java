@@ -1,5 +1,6 @@
 package edu.upc.eseiaat.pma.shoppinglist;
 
+import android.content.Context;
 import android.content.DialogInterface;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -12,10 +13,18 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 
 public class ShppingListActivity extends AppCompatActivity {
+
+    private static final String FILNAME = "shopping_list.txt ";
+    private static final int MAX_BYTES = 8000;
 
     private ArrayList<ShoppingItem> itemList;
     private shopingListAdapter adapter;
@@ -24,6 +33,62 @@ public class ShppingListActivity extends AppCompatActivity {
     private ListView list;
     private Button btn_add;
     private EditText edit_item;
+
+    private void writeItemList(){
+
+
+        try {
+
+            FileOutputStream fos = openFileOutput(FILNAME, Context.MODE_PRIVATE);
+            for (int i = 0; i<itemList.size(); i++) {
+                ShoppingItem it = itemList.get(i);
+                String line = String.format("%s;%d\n", it.getText(), it.isCheck());
+                fos.write(line.getBytes());
+
+            }
+            fos.close();
+        } catch (FileNotFoundException e) {
+            Toast.makeText(this, R.string.cannot_write,Toast.LENGTH_SHORT).show();
+        } catch (IOException e) {
+            Toast.makeText(this, R.string.cannot_write,Toast.LENGTH_SHORT).show();
+
+        }
+
+
+    }
+
+    private void readItemList(){
+        itemList = new ArrayList<>();
+        try {
+            FileInputStream fis = openFileInput(FILNAME);
+            byte[] buffer = new byte[MAX_BYTES];
+            int nread = fis.read(buffer);
+            String content = new String(buffer, 0, nread);
+            String[] lines = content.split("\n");
+            for (String line : lines) {
+                String[] parts = line.split(";");
+                itemList.add(new ShoppingItem(parts[0], parts[1].equals("true")));
+            }
+            fis.close();
+
+
+
+        } catch (FileNotFoundException e) {
+
+        } catch (IOException e) {
+            Toast.makeText(this, R.string.cannot_read ,Toast.LENGTH_SHORT).show();
+
+        }
+
+
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        writeItemList();
+
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,8 +99,7 @@ public class ShppingListActivity extends AppCompatActivity {
         btn_add = (Button) findViewById(R.id.btn_add);
         edit_item = (EditText) findViewById(R.id.edit_item);
 
-        itemList = new ArrayList<>();
-        itemList.add(new ShoppingItem("patatas"));
+        readItemList();
 
         adapter = new shopingListAdapter(this,android.R.layout.simple_list_item_1,itemList);
 
